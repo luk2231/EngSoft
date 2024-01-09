@@ -12,29 +12,9 @@
     <link href="{{ url_for('static', filename='css/style.css')}}" rel="stylesheet">
 </head>
 <body>
-	<nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background-color: #004e2c;">
-		<div class="container">
-			<a class="navbar-brand" href="/"> PetHub Rs</a> <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button"><span class="navbar-toggler-icon"></span></button>
-			<div class="collapse navbar-collapse" id="navbarSupportedContent">
-				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-					<li class="nav-item">
-						<a class="nav-link" href="/">Inicio</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/#produtos">Produtos</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/#carrinho">Carrinho</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/login">Meu Perfil</a>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</nav>
-    <div class="container-fluid h-100">
-		<div class="row h-100 justify-content-center align-items-center" style="margin-top: 100px;">
+	{% include 'navbar.html' %} <!-- Inclui a barra de navegação -->
+    <div class="container-fluid">
+		<div class="row  justify-content-center align-items-center" style="margin-top: 100px;">
 			<div class="col-md-4">
 				<div class="card mt-3">
 					<div class="card-body">

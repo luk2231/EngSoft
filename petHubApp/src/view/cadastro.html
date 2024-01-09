@@ -12,27 +12,7 @@
     <link href="{{ url_for('static', filename='css/style.css')}}" rel="stylesheet">
 </head>
 <body>
-	<nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background-color: #004e2c;">
-		<div class="container">
-			<a class="navbar-brand" href="/"> PetHub Rs</a> <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button"><span class="navbar-toggler-icon"></span></button>
-			<div class="collapse navbar-collapse" id="navbarSupportedContent">
-				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-					<li class="nav-item">
-						<a class="nav-link" href="/">Inicio</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/#produtos">Produtos</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/#carrinho">Carrinho</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/login">Meu Perfil</a>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</nav>
+	{% include 'navbar.html' %} <!-- Inclui a barra de navegação -->
     <div class="container-fluid h-100">
 		<div class="row h-100 justify-content-center align-items-center" style="margin-top: 100px;">
 			<div class="col-md-4">
@@ -53,19 +33,9 @@
 								<label for="email">Email:</label>
 								<input type="email" class="form-control" name="email" id="email" placeholder="Digite seu e-mail">
 							</div>
-
-							<!-- Campo de CPF/CNPJ -->
-							<div class="form-group mb-1">
-								<label for="cli_tppessoa">Pessoa Física ou Jurídica:</label>
-								<select class="form-control maskField" id="cli_tppessoa" data-target-id="cpfOuCnpj">
-									<option value="select" data-mask="">Selecione</option>
-									<option value="cpf" data-mask="000.000.000-00">Pessoa Física</option>
-									<option value="cnpj" data-mask="00.000.000/0000-00">Pessoa Jurídica</option>
-								</select>
-							</div>
 							<div class="form-group mb-3">
-								<label for="cpfOuCnpj">Informe seu CPF/CNPJ:</label>
-								<input type="text" id="cpfOuCnpj" name="cpfOuCnpj" class="form-control" disabled="true" />
+								<label for="cpfOuCnpj">Informe seu CPF:</label>
+								<input type="text" data-mask="000.000.000-00" id="cpf" name="cpf" class="form-control" />
 								{% with invalid_document_message = get_flashed_messages(category_filter='invalid_document_message') %}
 									{% if invalid_document_message %}
 										{% for message in invalid_document_message %}
@@ -134,31 +104,5 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.11/jquery.mask.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-	<script>
-		 function applyMaskOnPlaceholder() {
-			var mask = $(this).find(':selected').data('mask');
-			var target = "#" + $(this).data('target-id');
-
-			$(target).mask(mask);
-			$(target).attr('placeholder', mask);
-		}
-
-		$(function() {
-		$('.maskField').on('change', function(e) {
-			var selectedValue = $(this).val();
-
-			if (selectedValue == "select"){
-				$("#cpfOuCnpj").val("");
-				applyMaskOnPlaceholder.call(this);
-				$("#cpfOuCnpj").prop("disabled", true);
-				return;
-			} else {
-				$("#cpfOuCnpj").prop("disabled", false);
-			}
-			applyMaskOnPlaceholder.call(this)
-		});
-		});
-		
-	</script>
 </body>
 </html>

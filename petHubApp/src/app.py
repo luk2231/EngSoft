@@ -1,16 +1,12 @@
 from flask import Flask, render_template, request, redirect, session, flash
 from decouple import config
-import pyrebase
 from json import dumps
-import firebase_admin
-from firebase_admin import auth, db
 import json
 import uuid 
 import hashlib
 from pprint import pprint
-
 import firebase_admin
-from firebase_admin import db, credentials
+from firebase_admin import auth, db, credentials
 
 app = Flask(__name__,template_folder='view')
 app.secret_key = 'secret'
@@ -103,6 +99,7 @@ def login():
                     return redirect('/user')
                 else:
                     flash("senha ou usuário inválidos", "invalid_user_password_message")
+                    return redirect('/login')
         except:
             return render_template('login.html')
     if request.method == "GET":
@@ -135,57 +132,93 @@ def invalid_password_or_document(password_encoded, password_confirmation_encoded
         
     if  wrong_password or not unique_document or  is_invalid_document_number:
         return True
+    
+
+def cadastrarUsuario(tipoCadastro, password, password_confirmation, document_formatted,  name, email, uid):
+    password_encoded = password.encode('utf-8')
+    password_confirmation_encoded = password_confirmation.encode('utf-8')
+    password_length = len(password)
+    
+    if invalid_password_or_document(password_encoded, password_confirmation_encoded, password_length, document_formatted):
+        if(tipoCadastro == 'pessoaFisica'):
+            return redirect('/cadastro')
+        elif(tipoCadastro == 'pessoaJuridica'):
+            return redirect('/cadastroLoja')
+    else:
+        # Create a SHA-1 hash object
+        sha1 = hashlib.sha1()
+
+        # Update the hash object with the encoded password
+        sha1.update(password_encoded)
+
+        # Get the hexadecimal representation of the hash
+        hashed_password = sha1.hexdigest()
         
+        #Database Directive
+        users.child(document_formatted).set(
+        {
+        'uid': uid,
+        'userName': name,
+        'userPassword':  hashed_password,
+        'userEmail': email,
+        # 'profilePicture': profilePicture
+        }
+        )
 
 @app.route("/cadastro", methods =['POST', 'GET'])
 def cadastro():
-    if request.method == 'POST':
-        # generates Random UID for Database
-        idx = uuid.uuid4()
-        uid = str(idx)
+    if request.method == 'POST':   
+        idx = uuid.uuid4(),
+        uid = str(idx) 
         email = request.form.get('email')
         name = request.form.get('nome')
-        document = request.form.get('cpfOuCnpj')
+        document = request.form.get('cpf')
         document_formatted = document.replace("-", "").replace(".", "").replace("/", "")
         password = request.form.get('password1')
-        password_length = len(password)
         password_confirmation = request.form.get('password2')
         # TODO: teremos profile picture?
         # profilePicture = request.form.get('profilePicture')
-        
-        #Hash that Passsword
-        password_encoded = password.encode('utf-8')
-        password_confirmation_encoded = password_confirmation.encode('utf-8')
+        cadastrarUsuario("pessoaFisica", password, password_confirmation, document_formatted, name, email, uid)
+        return redirect('/login')
+    else:
+        return render_template('cadastro.html')
 
-        if invalid_password_or_document(password_encoded, password_confirmation_encoded, password_length, document_formatted):
-            return redirect('/cadastro')
-        else:
-            # Create a SHA-1 hash object
-            sha1 = hashlib.sha1()
 
-            # Update the hash object with the encoded password
-            sha1.update(password_encoded)
+@app.route("/lojista")
+def lojista():
+    return render_template("/lojistaMenu.html")
 
-            # Get the hexadecimal representation of the hash
-            hashed_password = sha1.hexdigest()
-            
-            #Database Directive
-            users.child(document_formatted).set(
-            {
-            'uid': uid,
-            'userName': name,
-            'userPassword':  hashed_password,
-            'userEmail': email,
-            # 'profilePicture': profilePicture
-            }
-            )
-            return redirect('/login')
-    return render_template('cadastro.html')
+@app.route("/minhaLoja")
+def loja():
+    if('user' in session):
+      print(user)
+    return render_template("/minhaLoja.html")
 
+@app.route("/cadastroLoja", methods =['POST', 'GET'])
+def cadastroLoja():
+    if request.method == 'POST':
+        idx = uuid.uuid4(),
+        uid = str(idx) 
+        email = request.form.get('email')
+        name = request.form.get('nome')
+        document = request.form.get('cnpj')
+        document_formatted = document.replace("-", "").replace(".", "").replace("/", "")
+        password = request.form.get('password1')
+        password_confirmation = request.form.get('password2')
+        # TODO: teremos profile picture?
+        # profilePicture = request.form.get('profilePicture')
+        cadastrarUsuario("pessoaJuridica", password, password_confirmation, document_formatted, name, email, uid)
+        return redirect('/login')   
+    else:
+        return render_template('cadastroLoja.html')
+    
 @app.route("/logout", methods =['GET'])
 def logout():
     session.pop('user')
     return redirect("/")
 
+@app.route("/navbar")
+def navbar():
+    return render_template("/navbar.html")
 
 
